@@ -1,6 +1,6 @@
 # Dataset Description
 
-* **`Train.csv`** - 284780 rows x 8 columns (Inlcudes UnitPrice Columns as Target)
+* **`Train.csv`** - 284780 rows x 8 columns (Inlcudes **`UnitPrice`** Columns as Target)
 * **`Test.csv`** - 122049 rows x 7 columns
 * **`Sample Submission.csv`** - Please check the Evaluation section for more details on how to generate a valid submission
  
