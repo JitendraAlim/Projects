@@ -1,5 +1,7 @@
 # Background
 
+<center><img src="https://www.nasa.gov/sites/default/files/thumbnails/image/61a-s-0139.jpg"></center>
+
 "Up until January 28, 1986, the Challenger had been launched 24 times with no catastrophes. A catastrophe can occur, in particular, if the collective failure of all the so-called O-rings occurs. However, 7 of the 24 Challenger launches had experienced at least one O-ring failure. During one of such launches, three of five rings failed. One launch had two O-rings failed, and five launches had a single failure. So collectively, there were ten O-ring failures.
 
 On the day of the January 28th launch, which had already been postponed a few times due to bad weather and other technical difficulties, the temperature at the launch site, Kennedy Space Center, Florida, was unusually cold with morning temperature close to 30 degrees Fahrenheit minus one degree Celsius. Some engineers expressed concerns about the launch in such cold weather given that there was no data to certify this successful launch at those temperatures. It was eventually decided to go ahead with the launch.
