@@ -4,7 +4,6 @@
 * **`Test.csv`** - 122049 rows x 7 columns
 * **`Sample Submission.csv`** - Please check the Evaluation section for more details on how to generate a valid submission
  
-#
 # Attribute Description:
 
 * **`Invoice No`** - Invoice ID, encoded as Label
