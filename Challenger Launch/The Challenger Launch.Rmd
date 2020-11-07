@@ -1,0 +1,223 @@
+---
+title: <center><h1 style="color:#535c68;font-size:150%">The Challenger Launch</h1></center>
+output:
+  html_document:
+    df_print: paged
+    number_sections: TRUE
+    toc: TRUE
+    toc_float:
+      collapsed: TRUE
+      smooth_scroll: TRUE
+    theme: spacelab
+    highlight: tango
+---
+
+***
+<center><img src="https://www.nasa.gov/sites/default/files/thumbnails/image/61a-s-0139.jpg"></center>
+
+```{r, message=FALSE, echo=FALSE}
+knitr::opts_chunk$set(comment = NA,
+                      dpi = 200,
+                      fig.align = 'center')
+ 
+setwd("Your Working Directory Path Here")
+```
+
+
+***
+# Background
+
+"Up until January 28, 1986, the Challenger had been launched 24 times with no catastrophes. A catastrophe can occur, in particular, if the collective failure of all the so-called O-rings occurs. However, 7 of the 24 Challenger launches had experienced at least one O-ring failure. During one of such launches, three of five rings failed. One launch had two O-rings failed, and five launches had a single failure. So collectively, there were ten O-ring failures.
+
+On the day of the January 28th launch, which had already been postponed a few times due to bad weather and other technical difficulties, the temperature at the launch site, Kennedy Space Center, Florida, was unusually cold with morning temperature close to 30 degrees Fahrenheit minus one degree Celsius. Some engineers expressed concerns about the launch in such cold weather given that there was no data to certify this successful launch at those temperatures. It was eventually decided to go ahead with the launch.
+
+Tragically, Challenger experienced a catastrophe were all of the five O-Rings failed leading to the destruction of the shuttle and killing everybody on board. The launch and the subsequent disaster were broadcasted live on television to a large audience across the United States, making headline news."
+
+
+***
+# About Data
+
+A shuttle has 5 O-rings, and there were 24 launches, which gives us a total of 120 observations.
+
+By looking at the data, one launch experienced 3 O-ring failures, one experienced 2 O-ring
+failures, and all the others experienced 1 O-ring failure.
+
+
+***
+# Analysis
+
+
+***
+##
+
+Now we will turn to a real-world use of logistic regression. Make a scatter plot for the temperatures at launch and the number of O-rings that failed using data only for when the failures of O-rings did occur. Can you tell if there is a significant relationship between the temperatures and O-ring failures?
+
+```{r, message=FALSE}
+# Importing Required Libraries
+library(ggplot2)
+library(dplyr)
+```
+
+```{r}
+challenger <- read.csv(file = 'challenger.csv')
+
+challenger
+```
+
+```{r}
+table(challenger$Y)
+```
+
+We confirm that collectively, there were 10 O-ring failures.
+
+Now, we plot a scatter plot for the temperatures at launch and the number of O-rings that failed using data only for when the failures of O-rings did occur.
+
+```{r}
+challenger %>%
+  filter(Y == 1) %>%
+  group_by(X) %>%
+  summarize(Failures = sum(Y), .groups = "keep")
+```
+
+```{r}
+challenger %>%
+  filter(Y == 1) %>%
+  group_by(X) %>%
+  summarize(Failures = sum(Y), .groups = "keep") %>%
+  ggplot(aes(x = X,
+             y = Failures)) +
+  geom_point() +
+  labs(title = "Number of O-ring Failures at various Temperatures",
+       subtitle = "For instances when failure of O-rings did occur",
+       x = "Temperature",
+       y = "Number of Failures") +
+  theme_light()
+```
+
+There is no significant relation between the temperatures at launch and the number of O-rings that failed using data only for when the failures of O-rings did occur.
+
+
+***
+##
+
+The scatterplot that you just made ignores valuable information. Now, make a scatterplot with the complete data that includes the launches where no failures occurred. Can you now tell if there is a significant relationship between these two variables?
+
+```{r}
+ggplot(challenger,
+       aes(x = X,
+           y = Y,
+           color = factor(Y))) +
+  geom_point() +
+  labs(title = "O-ring Failures at various Temperatures",
+       subtitle = "For all the launches of the Challenger",
+       x = "Temperature",
+       y = "Failure") +
+  scale_colour_manual(values = c("#27ae60","#e74c3c")) +
+  theme_light() +
+  theme(legend.position = "none")
+```
+
+From the scatterplot, we can observe that there are more launches without any failure of O-rings at higher temperatures.
+
+
+***
+##
+
+We will now analyze this problem with regression analysis where $Y$ will be a binary variable showing failure versus no-failure and $X$ will be an independent variable showing temperature at time of the launch. Using logistic regression establish a relationship between independent and dependent variables and show the regression summary. Is temperature significant in determining the no failure versus failure of O-rings? What does the sign for the coefficient of $\beta_1$ tells you?
+
+```{r}
+log_model <- glm(formula = Y ~ X,
+                 data = challenger,
+                 family = "binomial")
+
+summary(log_model)
+```
+
+Since the p-value corresponding to the coefficient of temperature < 0.05, we can conclude that temperature is significant in determining the no failure versus failure of O-rings.
+
+Since the sign of $\beta_1$ is negative, we can conclude that, for an increase in the temperature, the odds of failure of O-rings decreases.
+
+
+***
+##
+
+At the 95% significance level, what is the confidence interval for $\beta_1$? Can you tell if the coefficient for $\beta_1$ is significant just by looking at the confidence interval? How?
+
+$$\beta_1 \pm z_{\alpha/2} \times S.E.(\beta_1)$$
+
+```{r}
+# Coefficient
+(beta1 <- log_model$coefficients[[2]])
+
+# Standard Error of the coefficient
+(se_beta1 <- 0.04723)
+
+ci_lower <- beta1 - qnorm(p = 0.975) * se_beta1
+
+ci_upper <- beta1 + qnorm(p = 0.975) * se_beta1
+
+# 95% Confidence Interval for Beta Coefficient
+c(ci_lower, ci_upper)
+```
+
+The 95% significance level confidence interval for $\beta_1$ is (`r round(ci_lower, 4)`,`r round(ci_upper, 4)`).
+
+Since this confidence interval doesn't include 0 (zero) therefore we can conclude that $\beta_1$ is significant.
+
+
+***
+##
+
+By how much do the odds of failure change when the temperature increases by one degree Fahrenheit?
+
+When the temperature increases by one degree Fahrenheit, the odds of failure of O-rings decreases by **0.14661**.
+
+
+***
+##
+
+What was the probability of failure of all of the 5 O-rings on the morning of January 28, 1986 given that the temperature at launch was 36 degrees Fahrenheit? Explicitly, calculate in R the following:
+
+$$P(Y = 1 \mid X = 36) = \frac{e^{\beta_0 + \beta_1 X}}{1 + e^{\beta_0 + \beta_1 X}}$$
+
+Here, we note that the failure of a O-ring is independent to the failure of the other O-rings of the Challenger.
+
+```{r}
+# Coefficient of Intercept (Beta0)
+beta0 <- log_model$coefficients[[1]]
+
+# Coefficient of Temperature (Beta1) 
+beta1 <- log_model$coefficients[[2]]
+
+# Calculating Odds of failure of single O-ring
+odds <- exp(beta0 + beta1 * 36)
+
+# Calculating probability of failure of single O-ring
+fail_1ring_prob <- odds / (1 + odds)
+
+# Probability of failure of all of the 5 O-rings
+fail_1ring_prob ^ 5
+```
+
+The probability of failure of all of the 5 O-rings on the morning of January 28, 1986 given that the temperature at launch was 36 degrees Fahrenheit is `r round(fail_1ring_prob ^ 5, 4)`.
+
+
+***
+##
+Create a table (or a matrix) that shows the probability of failures for individual O-rings at various temperatures according to your model.
+
+Explicitly, create a table with 3 columns, one for temperature $(X)$, another one for the probability of failure of one O-ring given the different values of temperature in the data or $P(Y = 1 \mid X)$, and another one for the probability that all 5 O-rings fail or $P(Catastrophe \mid X)$.
+
+
+```{r}
+predictions <- data.frame(Temperature = 50:90,
+                          Failure_Prob = predict(object = log_model,
+                                                 newdata = data.frame(X = 50:90),
+                                                 type = "response"))
+
+predictions <- predictions %>%
+  mutate(Failure_Prob = round(Failure_Prob, 4),
+         Catastrophe_Prob = round(Failure_Prob ^ 5, 4))
+
+predictions
+```
